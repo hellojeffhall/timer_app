@@ -1,0 +1,12 @@
+{
+  "name": "timer_app",
+  "version": "0.0.1",
+  "description": "A system for tracking time.",
+  "dependencies": {
+    "express": "^4.12.4",
+    "jade": "^1.11.0",
+    "nodemon": "^1.3.7",
+    "pg": "^4.4.0",
+    "socket.io": "^1.3.5"
+  }
+}
