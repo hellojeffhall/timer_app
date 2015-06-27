@@ -1,11 +1,28 @@
 <!DOCTYPE HTML>
 <html>
     <head>
-        <title></title>
+        <title>Time App</title>
+        <link rel='stylesheet' type='text/css' href="style.css">
     </head>
     <body>
-        <p id="testID">no!</p>
+        <h3>Timer App</h3>
+            <input id="new_task_text" placeholder="New task..."></input>
+            <button id="new_task_submit">Add</button>
+        <table id="task_list_table">
+            <thead>
+                <tr>
+                    <td>Task Name</td>
+                    <td>Start Time</td>
+                    <!--<td>Duration</td> -->
+                    <td>Delete</td>
+                </tr>
+            </thead>
+            <tbody id="task_list_body">
+            </tbody>
+        </table>
+
+        <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+        <script> var socket = io.connect(); </script>
         <script src="scripts.js"></script>
-        <script src="/socket.io/socket.io.js"></script>
     </body>
 </html>

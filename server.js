@@ -2,36 +2,31 @@ var http = require('http');
 var url = require('url');
 var path = require('path');
 var fs = require('fs');
+var socket = require('socket.io');
 
 var root = __dirname;
-var files_to_serve = {
-                "/":  {
-                                }, 
-                "/404.html":    {
-                                }
-            };
+var tasks = [];
 
 var sendPage = function (response, requested_url) {
 
     // Create readstream.
-    stream_read = fs.createReadStream(requested_url);
+    var stream_read = fs.createReadStream(requested_url);
     
-        // As the stream returns chunks of data, write them
-        // to the repsonse.
-        stream_read.on('data', function(chunk){
-            response.write(chunk);               
-        });
+    // As the stream returns chunks of data, write them
+    // to the repsonse.
+    stream_read.on('data', function ( chunk ) {
+        response.write(chunk);               
+    });
 
-        stream_read.on('error', function(err){
-            console.log('error! requested_url: ' + requested_url);
-            console.log(err);
-            send404(response);
-        });
+    stream_read.on('error', function(err){
+        console.log('error! requested_url: ' + requested_url);
+        console.log(err);
+        send404(response);
+    });
 
-        stream_read.on('end',function(){
-            response.end();
-        });
-
+    stream_read.on('end',function(){
+        response.end();
+    });
 };
 
 var send404 = function (response) {
@@ -55,24 +50,30 @@ var server = http.createServer(function (request, response) {
     if( (requested_url.indexOf('\0')!==-1) || (requested_url.indexOf(root)!==0) ){
         console.log('NULL BYTE OR DIRECTORY TRAVERSAL ATTEMPT');
         send404(response);   
-    }
-    else if( (requested_url) == (root + '/')){
+    }    
+    else if( (requested_url) === (root + '/')){
         sendPage(response, requested_url + 'index.html');
     }
     else{
         sendPage(response, requested_url);
     }
-    
-    // Make sure that the requested URL is whitelisted as something
-    // that we allow people to request.
-    // If the user request a page that isn't on the whitelist, 
-    // send the user to the 404 page.
-    
-//    if(views[request.url] == null){
-//        send404(response);
-//    }
-//    else{
-//        console.log(requested_url + ' is on the whitelist!');
-//    }
-//    
+      
 }).listen(8080);
+
+var io = socket.listen(server);
+
+io.sockets.on('connection', function (socket) {
+    console.log('new connection!');
+
+    socket.on('task_create', function(data){
+        console.log(typeof data);
+        //console.log(typeof
+        console.log('new task requested: ' + data.name);
+        addTask(data.name, data.ts_start);
+    });
+    
+});
+var addTask = function (taskname, time_start) {
+    tasks.push(taskname);
+    io.sockets.emit('add_task', {name: taskname, ts_start : time_start});
+};
